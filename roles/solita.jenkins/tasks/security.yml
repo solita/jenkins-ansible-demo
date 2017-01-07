@@ -1,0 +1,93 @@
+---
+- name: Create an SSH key for the jenkins Unix user
+  become: yes
+  user: name=jenkins generate_ssh_key=yes
+  register: user
+
+- set_fact:
+    solita_jenkins_public_key: "{{ user.ssh_public_key }}"
+
+- name: Install the matrix-auth plugin and its dependencies
+  become: yes
+  get_url:
+    url: "http://updates.jenkins-ci.org/latest/{{ item }}.hpi"
+    dest: /var/lib/jenkins/plugins
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  register: matrix_auth_plugin
+  with_items:
+    - icon-shim
+    - matrix-auth
+
+- name: Create solita_jenkins password file
+  become: yes
+  copy:
+    content: >
+      {{ lookup("password", solita_jenkins_password_dir + "/solita_jenkins") }}
+    dest: /var/lib/jenkins/solita_jenkins_password
+    owner: jenkins
+    group: jenkins
+    mode: 0600
+    force: no
+
+- name: Read solita_jenkins password file
+  become: yes
+  command: cat /var/lib/jenkins/solita_jenkins_password
+  register: cat_password
+  changed_when: False
+
+- set_fact:
+    solita_jenkins_password: "{{ cat_password.stdout }}"
+
+- name: Create Jenkins security realm configuration script
+  become: yes
+  template:
+    src: solita_jenkins_security_realm.groovy.j2
+    dest: /var/lib/jenkins/init.groovy.d/solita_jenkins_security_realm.groovy
+    owner: jenkins
+    group: jenkins
+    mode: 0700
+  register: security_realm
+
+- name: Check if config.xml exists
+  stat:
+    path: /var/lib/jenkins/config.xml
+  register: config_xml
+
+- name: Stop Jenkins to create config.xml
+  service: name=jenkins state=stopped
+  when: solita_jenkins_restart and (not config_xml.stat.exists)
+
+- name: Set the TCP port for JNLP agents
+  become: yes
+  lineinfile:
+    dest: /var/lib/jenkins/config.xml
+    regexp: "^(\\s*)<slaveAgentPort>"
+    line: "\\1<slaveAgentPort>{{ solita_jenkins_jnlp_port }}</slaveAgentPort>"
+    backrefs: yes
+  register: jnlp_port
+
+- include: restart.yml
+  when: (matrix_auth_plugin | changed) or (security_realm | changed) or (jnlp_port | changed)
+
+- name: Check that user variables are only used with solita_jenkins_security_realm='jenkins'
+  fail: msg="User variables are only allowed with solita_jenkins_security_realm='jenkins'"
+  when: ({{ item }} | length > 0) and ((solita_jenkins_security_realm | default(None)) != 'jenkins')
+  with_items:
+    - solita_jenkins_users
+    - solita_jenkins_absent_users
+
+- name: Add present Jenkins users
+  solita_jenkins_user:
+    solita_jenkins_cli: "{{ solita_jenkins_cli }}"
+    name: "{{ item }}"
+    password: "{{ lookup('password', solita_jenkins_password_dir + '/' + item) }}"
+  with_items: "{{ solita_jenkins_users }}"
+
+- name: Remove absent Jenkins users
+  solita_jenkins_user:
+    solita_jenkins_cli: "{{ solita_jenkins_cli }}"
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ solita_jenkins_absent_users }}"

@@ -1,0 +1,40 @@
+---
+- include: security.yml
+  tags: solita_jenkins_security
+
+- include: plugins.yml
+
+# Copy job-dsl-config.xml to server so we can use Jenkins CLI to create a new
+# job from it.
+- name: Copy job-dsl-config.xml to destination
+  become: yes
+  copy:
+    src: job-dsl-config.xml
+    dest: /var/lib/jenkins/job-dsl-config.xml
+    owner: jenkins
+    group: jenkins
+
+- name: Create the job-dsl job
+  shell: >
+    {{ solita_jenkins_cli }} create-job job-dsl </var/lib/jenkins/job-dsl-config.xml
+  args:
+    creates: /var/lib/jenkins/jobs/job-dsl/config.xml
+  register: create_job_dsl_job
+
+# Overwrite the config.xml of an already-created job.
+- name: Update the job-dsl job configuration
+  become: yes
+  copy:
+    src: job-dsl-config.xml
+    dest: /var/lib/jenkins/jobs/job-dsl/config.xml
+    owner: jenkins
+    group: jenkins
+  register: update_job_dsl_job
+
+- name: Reload the job-dsl job
+  command: >
+    {{ solita_jenkins_cli }} reload-job job-dsl
+  when: update_job_dsl_job | changed
+
+- include: jobs.yml
+  tags: solita_jenkins_jobs

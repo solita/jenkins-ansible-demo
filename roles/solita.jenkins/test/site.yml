@@ -1,0 +1,27 @@
+---
+- hosts: vagrant
+
+  # The unit tests expect that a basic installation is present, because they
+  # limit the role application to the part they're testing with tags.
+  roles:
+    - solita.jenkins
+
+  tasks:
+    - name: Install Ruby development tools
+      apt: name={{ item }} state=present
+      become: yes
+      with_items:
+        - ruby-dev
+        - g++
+      tags: ruby
+
+    - name: Install Bundler
+      command: gem install bundler
+      become: yes
+      tags: ruby
+
+    - name: Install Ruby gems
+      command: bundle install
+      args:
+        chdir: /solita.jenkins/test
+      tags: ruby

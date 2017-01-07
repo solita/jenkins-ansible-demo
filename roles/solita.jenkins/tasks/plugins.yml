@@ -1,0 +1,13 @@
+# We can't leave this up to geerlingguy.jenkins because it always restarts
+# Jenkins after installing new plugins, and we only want to do that with
+# solita_jenkins_restart: yes.
+---
+- name: Install Jenkins plugins.
+  command: >
+    {{ solita_jenkins_cli }} install-plugin {{ item }}
+    creates=/var/lib/jenkins/plugins/{{ item }}.jpi
+  with_items: "{{ solita_jenkins_plugins_required + solita_jenkins_plugins }}"
+  register: plugins
+
+- include: restart.yml
+  when: plugins | changed

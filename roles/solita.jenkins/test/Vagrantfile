@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = 'ubuntu/trusty64'
+
+  config.vm.synced_folder "..", "/solita.jenkins"
+  config.vm.network :forwarded_port, guest: 8081, host: 9080
+
+  config.vm.provider 'virtualbox' do |v|
+    v.memory = 1024
+  end
+
+  config.vm.provision 'shell', privileged: false, inline: <<-EOF
+    set -e
+
+    # Install Ansible
+    sudo apt-get update
+    sudo apt-get install -y python-setuptools python-dev libffi-dev libssl-dev git
+    sudo -H easy_install -U pip
+    sudo -H pip install -U setuptools
+    sudo -H pip install ansible==2.1.0.0
+
+    # Start new login shells in the /solita.jenkins/test directory
+    echo 'cd /solita.jenkins/test' >> ~/.profile
+
+    # Install role dependencies
+    cd /solita.jenkins/test
+    bash install-dependencies.sh
+
+    # Perform a basic installation of the role (assumed by the tests)
+    export PYTHONUNBUFFERED=1
+    ansible-playbook -i environments/vagrant/inventory site.yml
+  EOF
+end

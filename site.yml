@@ -1,0 +1,60 @@
+---
+- hosts: jenkins
+  vars:
+    java_packages:
+      - java-1.8.0-openjdk-devel
+
+    solita_jenkins_security_realm: none
+    solita_jenkins_plugins:
+      - blueocean
+      - workflow-aggregator
+      - ansible
+      - multiple-scms
+
+    solita_ansible_requirements_file: ''
+
+  roles:
+    - solita.jenkins
+    - solita.ansible
+
+  tasks:
+    - name: Install Maven
+      yum: name=maven state=present
+      tags: maven
+
+    - name: Install Git
+      yum: name=git state=present
+      tags: git
+
+    - name: Generate SSH key for Jenkins
+      user: name=jenkins generate_ssh_key=yes
+
+    - name: Fetch Jenkins' SSH key
+      fetch:
+        src: /var/lib/jenkins/.ssh/id_rsa.pub
+        dest: "{{ playbook_dir }}/jenkins_id_rsa.pub"
+        flat: yes
+
+- hosts: app
+  tasks:
+    - name: Create the user jenkins
+      user:
+        name: jenkins
+        shell: /bin/bash
+
+    - name: Give jenkins sudo permissions
+      copy:
+        dest: /etc/sudoers.d/jenkins
+        content: "jenkins ALL = (ALL:ALL) NOPASSWD: ALL"
+        validate: visudo -cf %s
+
+    - name: Add Jenkins' SSH key
+      authorized_key: "user=jenkins key='{{ item }}'"
+      with_file:
+        - "{{ playbook_dir }}/jenkins_id_rsa.pub"
+
+    - name: Create the user hello
+      user:
+        name: hello
+        home: /opt/hello
+        shell: /usr/sbin/nologin

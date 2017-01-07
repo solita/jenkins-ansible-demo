@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Solita CD
+  description: Jenkins installations entirely under configuration management
+  company: Solita
+  license: MIT
+  min_ansible_version: 2.0.0.0
+  platforms:
+  - name: EL
+    versions:
+      - all
+  - name: Ubuntu
+    versions:
+      - all
+dependencies:
+  - role: geerlingguy.jenkins
+    version: 2.5.0
+    become: yes

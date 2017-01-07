@@ -1,0 +1,22 @@
+APP_GIT = "{{ app_git | default('') }}"
+PIPELINE_GIT = "{{ pipeline_git | default('') }}"
+
+pipelineJob('hello') {
+    multiscm {
+        if (APP_GIT) {
+            git(APP_GIT)
+        }
+        if (PIPELINE_GIT) {
+            git(PIPELINE_GIT)
+        }
+    }
+    triggers {
+        scm('H/5 * * * *')
+    }
+    definition {
+        cps {
+            script(readFileFromWorkspace('pipeline/Hello.groovy'))
+            sandbox()
+        }
+    }
+}

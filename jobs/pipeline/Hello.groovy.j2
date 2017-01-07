@@ -1,0 +1,84 @@
+APP_GIT = "{{ app_git | default('') }}"
+APP_PATH = "{{ app_path | default('') }}"
+
+ANSIBLE_GIT = "{{ ansible_git | default('') }}"
+ANSIBLE_PATH = "{{ ansible_path | default('') }}"
+
+QA_INVENTORY = "{{ qa_inventory }}"
+PROD_INVENTORY = "{{ prod_inventory }}"
+
+node {
+    stage('Checkout') {
+        if (APP_GIT) {
+            git url: APP_GIT
+            checkout([
+                $class: 'GitSCM',
+                extensions: [[
+                    $class: 'RelativeTargetDirectory',
+                    relativeTargetDir: 'app'
+                ]],
+                userRemoteConfigs: [[url: APP_GIT]]
+            ])
+        } else if (APP_PATH) {
+            // Ignore "permission denied" errors
+            sh "rsync -av ${APP_PATH}/ app | true"
+        }
+
+        if (ANSIBLE_GIT) {
+            git url: ANSIBLE_GIT
+            checkout([
+                $class: 'GitSCM',
+                extensions: [[
+                    $class: 'RelativeTargetDirectory',
+                    relativeTargetDir: 'ansible'
+                ]],
+                userRemoteConfigs: [[url: ANSIBLE_GIT]]
+            ])
+        } else if (ANSIBLE_PATH) {
+            // Ignore "permission denied" errors
+            sh "rsync -av ${ANSIBLE_PATH}/ ansible | true"
+        }
+    }
+
+    stage('Build') {
+        dir('app') {
+            sh 'mvn -B package'
+            archive 'target/hello.jar'
+        }
+    }
+
+    stage('Test') {
+        dir('app') {
+            sh 'mvn -B verify'
+            junit 'target/failsafe-reports/*.xml'
+        }
+    }
+
+    stage('Deploy to QA') {
+        dir('ansible') {
+            ansiblePlaybook([
+                playbook: 'deploy.yml',
+                inventory: QA_INVENTORY,
+                extraVars: [
+                    hello_jar: '../app/target/hello.jar'
+                ],
+                colorized: true
+            ])
+        }
+    }
+
+    stash name: 'workspace'
+}
+
+timeout(time: 5, unit: 'DAYS') {
+    stage('Deploy to Production') {
+        input message: 'Deploy to Production?'
+        node {
+            unstash 'workspace'
+            dir('ansible') {
+                sh 'pwd'
+                sh 'ls'
+            }
+        }
+    }
+}
