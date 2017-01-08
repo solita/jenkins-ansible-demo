@@ -10,7 +10,6 @@ PROD_INVENTORY = "{{ prod_inventory }}"
 node {
     stage('Checkout') {
         if (APP_GIT) {
-            git url: APP_GIT
             checkout([
                 $class: 'GitSCM',
                 extensions: [[
@@ -25,7 +24,6 @@ node {
         }
 
         if (ANSIBLE_GIT) {
-            git url: ANSIBLE_GIT
             checkout([
                 $class: 'GitSCM',
                 extensions: [[
