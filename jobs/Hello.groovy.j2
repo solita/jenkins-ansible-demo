@@ -1,13 +1,13 @@
 APP_GIT = "{{ app_git | default('') }}"
-PIPELINE_GIT = "{{ pipeline_git | default('') }}"
+ANSIBLE_GIT = "{{ ansible_git | default('') }}"
 
 pipelineJob('hello') {
     multiscm {
         if (APP_GIT) {
             git(APP_GIT)
         }
-        if (PIPELINE_GIT) {
-            git(PIPELINE_GIT)
+        if (ANSIBLE_GIT) {
+            git(ANSIBLE_GIT)
         }
     }
     triggers {
