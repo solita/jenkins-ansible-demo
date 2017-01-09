@@ -19,6 +19,7 @@ Vagrant.configure(2) do |config|
                          'qa_inventory' => 'environments/local/inventory',
                          'prod_inventory' => 'environments/local/inventory',
                          'solita_jenkins_security_realm' => 'none'},
+      'jenkins_sudo_access' => ['default'],
       'app' => ['default']
     }
   end
