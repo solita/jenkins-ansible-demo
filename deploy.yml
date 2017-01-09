@@ -3,7 +3,7 @@
   tasks:
     - copy:
         src: "{{ hello_jar }}"
-        dest: /opt/hello.jar
+        dest: /opt/hello/hello.jar
         owner: hello
         group: hello
         mode: u=rw,go=r
