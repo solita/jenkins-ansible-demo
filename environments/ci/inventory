@@ -1,6 +1,6 @@
-jenkins-ansible-demo1 ansible_ssh_user=centos
-jenkins-ansible-demo2 ansible_ssh_user=centos
-jenkins-ansible-demo3 ansible_ssh_user=centos
+jenkins-ansible-demo1 ansible_ssh_host=52.214.213.50 ansible_ssh_user=centos
+jenkins-ansible-demo2 ansible_ssh_host=52.214.214.169 ansible_ssh_user=centos
+jenkins-ansible-demo3 ansible_ssh_host=52.214.213.167 ansible_ssh_user=centos
 
 [jenkins]
 jenkins-ansible-demo1

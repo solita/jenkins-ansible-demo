@@ -1,2 +1,2 @@
 [app]
-jenkins-ansible-demo2 ansible_ssh_user=centos
+jenkins-ansible-demo2 ansible_ssh_host=52.214.214.169 ansible_ssh_user=centos
