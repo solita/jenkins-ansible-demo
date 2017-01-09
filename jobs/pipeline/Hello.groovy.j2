@@ -73,8 +73,13 @@ timeout(time: 5, unit: 'DAYS') {
         node {
             unstash 'workspace'
             dir('ansible') {
-                sh 'pwd'
-                sh 'ls'
+                ansiblePlaybook([
+                    playbook: 'deploy.yml',
+                    inventory: QA_INVENTORY,
+                    extraVars: [
+                        hello_jar: '../app/target/hello.jar'
+                    ],
+                ])
             }
         }
     }
