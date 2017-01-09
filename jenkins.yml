@@ -8,7 +8,6 @@
       - blueocean
       - workflow-aggregator
       - ansible
-      - multiple-scms
 
     solita_ansible_requirements_file: ''
 
