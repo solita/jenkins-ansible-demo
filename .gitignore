@@ -1,3 +1,4 @@
 .vagrant/
 .ansible_facts/
 jenkins_id_rsa.pub
+solita_jenkins_default_password

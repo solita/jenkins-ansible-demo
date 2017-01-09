@@ -1,0 +1,13 @@
+---
+- hosts: app
+  tasks:
+    - name: Add Jenkins' SSH key
+      authorized_key: "user=jenkins key='{{ item }}'"
+      with_file:
+        - "{{ playbook_dir }}/jenkins_id_rsa.pub"
+
+    - name: Create the user hello
+      user:
+        name: hello
+        home: /opt/hello
+        shell: /usr/sbin/nologin

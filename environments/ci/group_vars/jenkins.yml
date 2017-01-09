@@ -1,0 +1,7 @@
+---
+app_git: https://github.com/noidi/hello-java.git
+ansible_git: https://github.com/solita/jenkins-ansible-demo.git
+qa_inventory: environments/qa/inventory
+prod_inventory: environments/prod/inventory
+solita_jenkins_users:
+  - admin

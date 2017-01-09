@@ -1,0 +1,11 @@
+jenkins-ansible-demo1 ansible_ssh_user=centos
+jenkins-ansible-demo2 ansible_ssh_user=centos
+jenkins-ansible-demo3 ansible_ssh_user=centos
+
+[jenkins]
+jenkins-ansible-demo1
+
+[jenkins_sudo_access]
+jenkins-ansible-demo1
+jenkins-ansible-demo2
+jenkins-ansible-demo3

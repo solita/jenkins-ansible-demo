@@ -17,7 +17,8 @@ Vagrant.configure(2) do |config|
       'jenkins:vars' => {'app_path' => '/hello-java',
                          'ansible_path' => '/vagrant',
                          'qa_inventory' => 'environments/local/inventory',
-                         'prod_inventory' => 'environments/local/inventory'},
+                         'prod_inventory' => 'environments/local/inventory',
+                         'solita_jenkins_security_realm' => 'none'},
       'app' => ['default']
     }
   end

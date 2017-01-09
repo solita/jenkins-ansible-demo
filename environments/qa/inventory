@@ -1,0 +1,2 @@
+[app]
+jenkins-ansible-demo2 ansible_ssh_user=centos
