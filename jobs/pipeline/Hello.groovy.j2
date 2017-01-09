@@ -75,7 +75,7 @@ timeout(time: 5, unit: 'DAYS') {
             dir('ansible') {
                 ansiblePlaybook([
                     playbook: 'deploy.yml',
-                    inventory: QA_INVENTORY,
+                    inventory: PROD_INVENTORY,
                     extraVars: [
                         hello_jar: '../app/target/hello.jar'
                     ],
