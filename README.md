@@ -23,11 +23,39 @@ the finished configuration to a production Jenkins installation.
 5. Open http://localhost:8080 in a web browser. You should see the Jenkins
    installation running in the Vagrant machine.
 
+## Pipeline development workflow
+
+1. Edit the `Vagrantfile` and add the following line after the
+   `ansible.playbook` and `ansible.groups` settings:
+
+    ansible.tags = 'solita_jenkins_jobs'
+
+   This makes provisioning faster by limiting it to just Jenkins jobs.
+
+2. Edit the job definition in `jobs/Hello.groovy` or the pipeline definition in
+   `jobs/pipeline/Hello.groovy.j2`.
+
+3. Run `vagrant provision` to update Jenkins' configuration.
+
+## Moving the configuration to real servers
+
+1. Edit the inventories `environments/<ci|qa|prod>/inventory` and replace
+   `jenkins-ansible-demo1`, `jenkins-ansible-demo2`, `jenkins-ansible-demo3`
+   with servers to which you have SSH and sudo access.
+
+2. Provision the servers in each environment:
+
+    ansible-playbook -i environments/ci/inventory site.yml
+    ansible-playbook -i environments/qa/inventory site.yml
+    ansible-playbook -i environments/prod/inventory site.yml
+
 ## Known issues
 
 - The SSH host keys of the hosts in the `jenkins_sudo_access` group are not
-  added to the `jenkins` user's `.ssh/known_hosts` automatically. This is not a
-  fundamental problem but simply an omission (PRs accepted!).
+  added to the `jenkins` user's `.ssh/known_hosts` automatically. The
+  pipeline's deployment stages won't complete successfully until you've done
+  this manually (or configured Ansible to disable host key checking). This is
+  not a fundamental problem but simply an omission (PRs accepted!).
 
 ## License
 
