@@ -1,3 +1,10 @@
+// This file is written in Pipeline DSL. See
+// https://jenkins.io/doc/book/pipeline/ for an overview and
+// https://jenkins.io/doc/pipeline/steps/ for a reference.
+//
+// This file must be in a subdirectory and not directly in the jobs directory.
+// Otherwise Jenkins would treat is as a Job DSL file.
+
 APP_GIT = "{{ app_git | default('') }}"
 APP_PATH = "{{ app_path | default('') }}"
 
