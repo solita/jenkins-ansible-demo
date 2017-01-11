@@ -22,8 +22,9 @@ uses it to do the deployments.
 
 4. Create and provision a Vagrant machine:
 
-    cd ~/projects/jenkins-ansible-demo
-    vagrant up
+        cd ~/projects/jenkins-ansible-demo
+        vagrant up
+
 
 5. Open http://localhost:8080 in a web browser. You should see the Jenkins
    installation running in the Vagrant machine.
@@ -33,7 +34,7 @@ uses it to do the deployments.
 1. Edit the `Vagrantfile` and add the following line after the
    `ansible.playbook` and `ansible.groups` settings:
 
-    ansible.tags = 'solita_jenkins_jobs'
+        ansible.tags = 'solita_jenkins_jobs'
 
    This makes provisioning faster by limiting it to just Jenkins jobs.
 
@@ -52,9 +53,9 @@ uses it to do the deployments.
 
 2. Provision the servers in each environment:
 
-    ansible-playbook -i environments/ci/inventory site.yml
-    ansible-playbook -i environments/qa/inventory site.yml
-    ansible-playbook -i environments/prod/inventory site.yml
+        ansible-playbook -i environments/ci/inventory site.yml
+        ansible-playbook -i environments/qa/inventory site.yml
+        ansible-playbook -i environments/prod/inventory site.yml
 
 ## Known issues
 
