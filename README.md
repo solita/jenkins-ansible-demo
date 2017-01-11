@@ -1,9 +1,14 @@
 # Demo: Jenkins Configuration Management with Ansible
 
-This project is an example of using Ansible for Jenkins configuration
-management. It demonstrates how you can develop and test Jenkins jobs and
-pipelines against a Jenkins installation in a Vagrant machine and only apply
-the finished configuration to a production Jenkins installation.
+This Ansible project contains server and pipeline configuration for [a hello
+world application](https://github.com/noidi/hello-java). It demonstrates how
+you can develop and test Jenkins jobs and pipelines against a Jenkins
+installation in a Vagrant machine and only apply the finished configuration to
+a production Jenkins installation.
+
+The same project is used both for server configuration (`site.yml`) and
+deployment (`deploy.yml`). The Jenkins pipeline clones/rsyncs this project and
+uses it to do the deployments.
 
 ## Initial setup
 
@@ -37,6 +42,8 @@ the finished configuration to a production Jenkins installation.
 
 3. Run `vagrant provision` to update Jenkins' configuration.
 
+4. GOTO 2 until you're happy with your changes.
+
 ## Moving the configuration to real servers
 
 1. Edit the inventories `environments/<ci|qa|prod>/inventory` and replace
@@ -56,6 +63,10 @@ the finished configuration to a production Jenkins installation.
   pipeline's deployment stages won't complete successfully until you've done
   this manually (or configured Ansible to disable host key checking). This is
   not a fundamental problem but simply an omission (PRs accepted!).
+
+- **(WON'T FIX)** `deploy.yml` doesn't do a proper deployment. It simply copies
+  the JAR over to the server. Service setup and monitoring is out of scope for
+  this example.
 
 ## License
 
