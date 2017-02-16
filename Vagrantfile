@@ -8,7 +8,7 @@ Vagrant.configure(2) do |config|
   config.vm.network 'private_network', type: 'dhcp'
   config.vm.network 'forwarded_port', guest: 8080, host: 8080
 
-  config.vm.synced_folder '~/solita-cd/hello-java', '/hello-java'
+  config.vm.synced_folder '../hello-java', '/hello-java'
 
   config.vm.provision 'ansible' do |ansible|
     ansible.playbook = 'site.yml'
